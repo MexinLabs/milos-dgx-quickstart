@@ -1,0 +1,112 @@
+# milOS DGX Quickstart stack.
+#
+# Every core service belongs to both profiles; what changes between the laptop
+# and the DGX is the .env file (models, parallelism), not the topology:
+#   laptop: cp .env.example .env      -> COMPOSE_PROFILES=local
+#   DGX:    cp .env.dgx.example .env  -> COMPOSE_PROFILES=dgx
+# Then: docker compose up -d --build
+#
+# Everything speaks the OpenAI-compatible API, so swapping the model server
+# (Ollama -> vLLM, or a cloud endpoint) is a change to LLM_BASE_URL only.
+
+name: milos-dgx-quickstart
+
+x-profiles: &profiles
+  profiles: [local, dgx]
+
+x-gpu: &gpu
+  deploy:
+    resources:
+      reservations:
+        devices:
+          - driver: nvidia
+            count: all
+            capabilities: [gpu]
+
+services:
+  # Model server: LLM + VLM behind one OpenAI-compatible endpoint (/v1).
+  ollama:
+    <<: [*profiles, *gpu]
+    image: ollama/ollama:${OLLAMA_TAG:-0.40.18}
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    environment:
+      OLLAMA_KEEP_ALIVE: ${OLLAMA_KEEP_ALIVE:-10m}
+      OLLAMA_NUM_PARALLEL: ${OLLAMA_NUM_PARALLEL:-1}
+      OLLAMA_MAX_LOADED_MODELS: ${OLLAMA_MAX_LOADED_MODELS:-1}
+    volumes:
+      - ollama-models:/root/.ollama
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+  # FastAPI: chat/vision proxy, agent orchestrator, event stream, GPU metrics.
+  # It reserves the GPU only so NVML (GPU metrics) is visible inside the container.
+  backend:
+    <<: [*profiles, *gpu]
+    build: ./services/backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      CLIENT_NAME: ${CLIENT_NAME:-Cliente}
+      LLM_BASE_URL: ${LLM_BASE_URL:-http://ollama:11434/v1}
+      LLM_API_KEY: ${LLM_API_KEY:-ollama}
+      LLM_MODEL: ${LLM_MODEL}
+      LLM_REASONING_EFFORT: ${LLM_REASONING_EFFORT:-}
+      VLM_BASE_URL: ${VLM_BASE_URL:-http://ollama:11434/v1}
+      VLM_API_KEY: ${VLM_API_KEY:-ollama}
+      VLM_MODEL: ${VLM_MODEL}
+    volumes:
+      - ./services/backend/app:/app/app
+      - ./data:/data
+      # Lets the DGX Ops Copilot agent list running containers. The backend only
+      # reads from it; fine for a workshop machine, do not copy into a product.
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    depends_on:
+      ollama:
+        condition: service_healthy
+
+  # React + Vite UI (dev server; /api is proxied to the backend).
+  frontend:
+    <<: *profiles
+    build: ./services/frontend
+    restart: unless-stopped
+    ports:
+      - "5173:5173"
+    environment:
+      BACKEND_URL: http://backend:8000
+    volumes:
+      - ./services/frontend/src:/app/src
+      - ./services/frontend/index.html:/app/index.html
+    depends_on:
+      - backend
+
+  # JupyterLab on the NGC PyTorch container (CUDA + PyTorch built for the host arch).
+  jupyter:
+    <<: [*profiles, *gpu]
+    build:
+      context: ./services/jupyter
+      args:
+        BASE_IMAGE: ${JUPYTER_BASE_IMAGE:-nvcr.io/nvidia/pytorch:26.11-py3}
+    restart: unless-stopped
+    ipc: host
+    ulimits:
+      memlock: -1
+      stack: 67108864
+    ports:
+      - "8888:8888"
+    environment:
+      JUPYTER_TOKEN: ${JUPYTER_TOKEN:-workshop}
+      LLM_BASE_URL: ${LLM_BASE_URL:-http://ollama:11434/v1}
+      LLM_MODEL: ${LLM_MODEL}
+      VLM_MODEL: ${VLM_MODEL}
+    volumes:
+      - ./notebooks:/workspace/notebooks
+      - ./data:/workspace/data
+
+volumes:
+  ollama-models:

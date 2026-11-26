@@ -1,0 +1,7 @@
+jupyterlab
+ipywidgets
+openai
+pillow
+matplotlib
+pandas
+nvidia-ml-py
