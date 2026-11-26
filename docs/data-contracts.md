@@ -82,6 +82,9 @@ One envelope for everything the agents view draws (graph, timeline, token stream
 | `error` | `{message}` | marks the run as failed; `agent` is `null` |
 | `run_end` | `{ok, output, total_ms}` | shows the final answer; always the last event |
 
+The UI leaves `tokens_per_s` out of its counter when the call generated fewer
+than 20 tokens (a tool call, a one-word answer): too short to time.
+
 `agent` is `null` on `run_start`, `error` and `run_end`. `seq` starts at 0 and
 increases by one, so the UI can order events and detect gaps. A model step that
 only asks for tools has no `llm_delta`, just `llm_end` followed by `tool_call`

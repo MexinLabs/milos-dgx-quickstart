@@ -77,6 +77,21 @@ The small models make more mistakes. Two guards in the orchestrator keep the
 demo honest with them: findings are passed to the report writer by the
 orchestrator, and the data analyst must query the detail before it may answer.
 
+## 2026-11-26: frontend with Tailwind, no component kit, light theme
+
+The UI is React with Tailwind 4 and hand-written components; the only other
+runtime dependency is `react-markdown` for model output. No component kit and
+no chart library: the graph and the GPU sparkline are plain SVG. Fewer
+packages to install on a new machine, and nothing here needs more.
+
+Light theme, large type: the screen is read over a video call, and dark text
+on white survives compression better than the reverse.
+
+The frontend runs on the Vite dev server, which proxies `/api`. When the
+backend restarts, that proxy can leave an open event stream hanging instead of
+closing it, so the GPU panel reconnects on its own after a few seconds of
+silence, and an agent run that will never finish can be dropped from the UI.
+
 ## Open questions
 
 | Question | Why it matters |

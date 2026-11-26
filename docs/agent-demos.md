@@ -88,3 +88,8 @@ document preparation; too many moving parts for one day.
 | Timeline | ordered steps with duration; tool arguments and results expand on click |
 | Stream | the active agent's tokens as they arrive |
 | GPU panel | utilization, memory and tokens/s, always visible on every tab |
+| Model picker | every model on the server; the chat and the next agent run use the one selected |
+| Past runs | the runs of this browser session, by model and duration; a click replays one from the backend's event log |
+
+Code: `services/frontend/src/` (`lib/agentRun.ts` turns the events into the
+state every view draws; `components/AgentGraph.tsx`, `components/AgentTimeline.tsx`).

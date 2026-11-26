@@ -36,7 +36,7 @@ Larger models are listed in `.env.dgx.example`; download one with
 
 | What | URL |
 |---|---|
-| Web UI | http://localhost:5173 |
+| Web UI (Chat, Visión, Agentes, live GPU panel) | http://localhost:5173 |
 | JupyterLab | http://localhost:8888 (token: `JUPYTER_TOKEN` in `.env`) |
 | Backend API explorer | http://localhost:8000/docs |
 | Model server (OpenAI-compatible) | http://localhost:11434/v1 |

@@ -31,8 +31,9 @@ Las descargas corren en segundo plano mientras avanza la sesión.
 ## Bloque 8: mismo código, otro modelo
 
 Los agentes se corren primero con `qwen3:4b-instruct`. Cuando termina la
-etapa 3 se cambia `LLM_MODEL` a `qwen3:30b-instruct` y se repite la misma
-pregunta, para comparar qué tan bien usa las herramientas cada modelo.
+etapa 3 se elige `qwen3:30b-instruct` en el selector de modelo de la interfaz
+y se repite la misma pregunta, para comparar qué tan bien usa las herramientas
+cada modelo. Las corridas anteriores quedan a un clic para verlas otra vez.
 
 ## Si algo falla durante la sesión
 
