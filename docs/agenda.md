@@ -24,7 +24,7 @@ Las descargas corren en segundo plano mientras avanza la sesión.
 1. `./scripts/00-preflight.sh --deep`, sección por sección.
 2. `nvidia-smi`: GPU, versión del driver, procesos.
 3. `free -h`: la memoria de la Spark, compartida entre CPU y GPU.
-4. `docker info | grep -i runtime`: el runtime de NVIDIA.
+4. `docker info | grep -i -A4 "discovered devices"`: la GPU que Docker ofrece a los contenedores (`nvidia.com/gpu`).
 5. `docker run --rm --gpus all ubuntu:24.04 nvidia-smi`: la GPU dentro de un contenedor.
 6. NGC: de dónde salen los contenedores oficiales (`nvcr.io`).
 
