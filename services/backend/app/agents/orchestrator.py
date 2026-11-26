@@ -40,12 +40,17 @@ class Agent:
     sees_findings: bool = False
     # Its answer is the answer of whoever delegated to it: no extra model call to repeat it.
     answers_for_caller: bool = False
+    # A small model tends to answer after one query and make up the rest. Until it
+    # has made this many tool calls, an answer is sent back with `nudge` instead.
+    min_tool_calls: int = 0
+    nudge: str = ""
 
 
 @dataclass
 class RunContext:
     run: Run
     agents: dict[str, Agent]
+    llm_model: str  # text model for this run; vision agents always use VLM_MODEL
     image_url: str | None = None
     findings: list[tuple[str, str]] = field(default_factory=list)  # (agent label, output)
 
@@ -86,7 +91,7 @@ async def _complete(
     ctx: RunContext, agent: Agent, messages: list[dict], tools: list[dict] | None
 ) -> tuple[str, list[dict]]:
     """One model call. Returns the text and the tool calls it asked for."""
-    client, model = (vlm_client, settings.vlm_model) if agent.vision else (llm_client, settings.llm_model)
+    client, model = (vlm_client, settings.vlm_model) if agent.vision else (llm_client, ctx.llm_model)
     content = ""
     calls: list[dict] = []
     async for event in stream_chat(client, model, messages, tools):
@@ -155,7 +160,7 @@ async def _dispatch(ctx: RunContext, agent: Agent, call: dict) -> Any:
 
 
 async def run_agent(ctx: RunContext, agent: Agent, task: str, parent: str | None = None) -> str:
-    model = settings.vlm_model if agent.vision else settings.llm_model
+    model = settings.vlm_model if agent.vision else ctx.llm_model
     await ctx.run.emit("agent_start", agent.id, label=agent.label, model=model, task=task, parent=parent)
 
     if agent.sees_findings and ctx.findings:
@@ -175,12 +180,19 @@ async def run_agent(ctx: RunContext, agent: Agent, task: str, parent: str | None
     tools = _tool_specs(ctx, agent)
 
     output = ""
+    tool_calls_made = 0
     for step in range(MAX_STEPS + 1):
         # On the last step no tools are offered, so the model has to answer.
         content, calls = await _complete(ctx, agent, messages, tools if step < MAX_STEPS else None)
         if not calls:
+            if tool_calls_made < agent.min_tool_calls and step < MAX_STEPS:
+                messages.append({"role": "assistant", "content": content})
+                messages.append({"role": "user", "content": agent.nudge})
+                await ctx.run.emit("agent_retry", agent.id, reason=agent.nudge)
+                continue
             output = content
             break
+        tool_calls_made += len(calls)
         messages.append(
             {
                 "role": "assistant",
@@ -217,13 +229,21 @@ async def run_agent(ctx: RunContext, agent: Agent, task: str, parent: str | None
 
 
 async def execute(
-    run: Run, scenario_id: str, agents: dict[str, Agent], entry: str, task: str, image_url: str | None
+    run: Run,
+    scenario_id: str,
+    agents: dict[str, Agent],
+    entry: str,
+    task: str,
+    image_url: str | None,
+    llm_model: str | None = None,
 ) -> None:
     """Run a scenario to completion. The stream always closes with run_end."""
     start = time.perf_counter()
-    ctx = RunContext(run=run, agents=agents, image_url=image_url)
+    ctx = RunContext(run=run, agents=agents, llm_model=llm_model or settings.llm_model, image_url=image_url)
     ok, output = True, ""
-    await run.emit("run_start", None, scenario=scenario_id, input=task, has_image=image_url is not None)
+    await run.emit(
+        "run_start", None, scenario=scenario_id, input=task, has_image=image_url is not None, model=ctx.llm_model
+    )
     try:
         output = await run_agent(ctx, agents[entry], task)
     except Exception as exc:

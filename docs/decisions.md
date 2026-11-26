@@ -47,12 +47,35 @@ Consequences:
 
 - Participants build and run the repo themselves, so a clean clone must work
   by following `docs/guia-participante.md` and nothing else.
-- Downloads (about 115 GB) happen on each participant's side the day before.
 - Images are built on each Spark (arm64). A laptop only proves the amd64 path.
-- Memory budget: LLM and VLM stay loaded (about 40 GB); the 50 GB showcase
-  model is loaded on demand and evicts one of them (`OLLAMA_MAX_LOADED_MODELS=2`).
 - GPU memory may not be reported per GPU on unified memory; the GPU panel
   falls back to host memory.
+
+## 2026-11-26: small models by default, larger ones downloaded in stages
+
+A new Spark comes out of the box during the session, so nothing can be
+downloaded beforehand. The defaults are the small pair (`qwen3:4b-instruct`,
+`qwen3-vl:4b-instruct`, 5.8 GB together) and the machine is serving models
+minutes after the first boot. The rest arrives in the background, in the order
+the session needs it:
+
+| Stage | Download | Size |
+|---|---|---|
+| 1 | Ollama image and the two small models | 8.3 GB |
+| 2 | Jupyter image (NGC PyTorch, arm64) | 12.9 GB |
+| 3 | `qwen3:30b-instruct` for the agents | 18.6 GB |
+
+Sizes are compressed download sizes read from the registries. Larger models
+(`qwen3-vl:32b-instruct`, `qwen3-next:80b`) are optional and listed in
+`.env.dgx.example`.
+
+Switching to a larger model is a one-line change in `.env`, and an agent run
+can also name its model (`model` on `POST /api/agents/runs`), so the same
+scenario can be compared across models without restarting anything.
+
+The small models make more mistakes. Two guards in the orchestrator keep the
+demo honest with them: findings are passed to the report writer by the
+orchestrator, and the data analyst must query the detail before it may answer.
 
 ## Open questions
 

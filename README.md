@@ -22,12 +22,17 @@ NVIDIA Container Toolkit. Check it with:
 cp .env.dgx.example .env    # on the DGX
 cp .env.example .env        # on a laptop (small models)
 
-# 2. Download the models (DGX profile: about 90 GB, do it the day before)
+# 2. Download the models named in .env (the defaults are small: about 6 GB)
 ./scripts/download-model.sh
 
-# 3. Start everything
+# 3. Start everything (the Jupyter image is a 13 GB download)
 docker compose up -d --build
 ```
+
+To get a UI quickly and leave Jupyter for later, start with
+`docker compose up -d --build ollama backend frontend`.
+Larger models are listed in `.env.dgx.example`; download one with
+`./scripts/download-model.sh <model>` and set it in `.env`.
 
 | What | URL |
 |---|---|

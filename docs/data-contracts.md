@@ -27,7 +27,7 @@ All streaming endpoints use Server-Sent Events (SSE): one JSON object per `data:
 | POST | `/api/vision` | multipart `image` + `prompt`; streams `chat` events from `VLM_MODEL` | done |
 | GET | `/api/gpu/stream` | streams one `gpu` sample per second | done |
 | GET | `/api/agents/scenarios` | `{scenarios: [...]}`: each with the graph it draws and example questions | done |
-| POST | `/api/agents/runs` | multipart `scenario`, `input` and optional `image`; returns `{run_id}` | done |
+| POST | `/api/agents/runs` | multipart `scenario`, `input`, optional `image` and optional `model` (text model for this run, default `LLM_MODEL`); returns `{run_id}` | done |
 | GET | `/api/agents/runs/{run_id}/events` | streams `agent` events from `seq` 0, then live, and closes after `run_end` | done |
 
 ### `chat` event
@@ -70,13 +70,14 @@ One envelope for everything the agents view draws (graph, timeline, token stream
 
 | `type` | `data` | What the UI does |
 |---|---|---|
-| `run_start` | `{scenario, input, has_image}` | resets the graph |
+| `run_start` | `{scenario, input, has_image, model}` | resets the graph |
 | `agent_start` | `{label, model, task, parent}` | lights the agent node; `parent` is the agent that delegated, or `null` |
 | `llm_delta` | `{text, kind}` | appends to the agent's stream; `kind` is `answer` or `reasoning` |
 | `llm_end` | `{model, usage, ttft_ms, tokens_per_s}` | updates the tokens/s counter |
 | `tool_call` | `{call_id, tool, args}` | lights the tool node, animates the agent-to-tool edge |
 | `tool_result` | `{call_id, tool, ok, result, ms}` | shows the result (expandable) and the duration |
 | `handoff` | `{to, task}` | animates the agent-to-agent edge |
+| `agent_retry` | `{reason}` | the agent's answer so far is discarded (it answered before using its tools enough); clears its stream |
 | `agent_end` | `{output}` | dims the agent node |
 | `error` | `{message}` | marks the run as failed; `agent` is `null` |
 | `run_end` | `{ok, output, total_ms}` | shows the final answer; always the last event |

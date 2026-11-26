@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # Pull the models named in .env into this repo's own Ollama volume.
-# Run it the day before: the DGX profile downloads ~90 GB.
+# The defaults are the small models (about 6 GB); larger ones are listed in .env.dgx.example.
 #
-#   ./scripts/download-model.sh              pulls LLM_MODEL, VLM_MODEL and SHOWCASE_MODEL (if set)
-#   ./scripts/download-model.sh qwen3:8b     pulls only the models given as arguments
+#   ./scripts/download-model.sh              pulls LLM_MODEL and VLM_MODEL
+#   ./scripts/download-model.sh qwen3:30b-instruct   pulls only the models given as arguments
 
 set -euo pipefail
 cd "$(dirname "$0")/.."
@@ -19,7 +19,7 @@ if (( $# > 0 )); then
   MODELS=("$@")
 else
   MODELS=()
-  for var in LLM_MODEL VLM_MODEL SHOWCASE_MODEL; do
+  for var in LLM_MODEL VLM_MODEL; do
     value="$(read_env "$var")"
     [[ -n "$value" ]] && MODELS+=("$value")
   done

@@ -116,6 +116,7 @@ async def create_agent_run(
     scenario: str = Form(...),
     input: str = Form(...),
     image: UploadFile | None = File(None),
+    model: str | None = Form(None),
 ) -> dict:
     spec = SCENARIOS.get(scenario)
     if spec is None:
@@ -125,7 +126,7 @@ async def create_agent_run(
 
     run = create_run()
     image_url = await to_data_url(image) if image else None
-    task = asyncio.create_task(execute(run, spec.id, spec.build(), spec.entry, input, image_url))
+    task = asyncio.create_task(execute(run, spec.id, spec.build(), spec.entry, input, image_url, model))
     _agent_tasks.add(task)
     task.add_done_callback(_agent_tasks.discard)
     return {"run_id": run.id}

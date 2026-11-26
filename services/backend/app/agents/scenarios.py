@@ -158,6 +158,12 @@ def _shift_inspector() -> dict[str, Agent]:
                     },
                 )
             ],
+            min_tool_calls=2,
+            nudge=(
+                "Todavía falta el detalle. Consulta con query_production las filas por fecha de la línea "
+                "y turno que más se desvían (fecha, piezas_producidas, piezas_scrap, paro_min, "
+                "defecto_principal, causa_paro) y responde solo con lo que devuelva la consulta."
+            ),
         ),
         Agent(
             id="report_writer",
