@@ -101,8 +101,12 @@ services:
       - "8888:8888"
     environment:
       JUPYTER_TOKEN: ${JUPYTER_TOKEN:-workshop}
+      # The notebooks read the same model variables as the backend.
       LLM_BASE_URL: ${LLM_BASE_URL:-http://ollama:11434/v1}
+      LLM_API_KEY: ${LLM_API_KEY:-ollama}
       LLM_MODEL: ${LLM_MODEL}
+      VLM_BASE_URL: ${VLM_BASE_URL:-http://ollama:11434/v1}
+      VLM_API_KEY: ${VLM_API_KEY:-ollama}
       VLM_MODEL: ${VLM_MODEL}
     volumes:
       - ./notebooks:/workspace/notebooks

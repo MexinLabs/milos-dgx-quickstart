@@ -50,7 +50,17 @@ cp .env.dgx.example .env
 docker compose up -d --build ollama backend frontend
 ```
 
-Al terminar, la interfaz está en http://localhost:5173.
+Al terminar, la interfaz está en http://localhost:5173. Tiene tres pestañas y,
+a la derecha, el panel de GPU, que se ve desde cualquiera de ellas:
+
+| Pestaña | Qué hace |
+|---|---|
+| Chat | Conversación con el modelo de texto; cada respuesta muestra sus tokens por segundo |
+| Visión | Se carga una imagen (arrastrar, elegir o pegar) y se le pregunta al modelo de visión |
+| Agentes | Se elige un escenario y se ve qué agente trabaja, qué herramienta llama y qué le responde |
+
+El escenario "Inspector de turno" pide una foto: sirve cualquiera de una línea
+de producción, un almacén o un área de trabajo.
 
 ## Paso 3. Etapa 2: Jupyter (en otra terminal, en segundo plano)
 
@@ -61,6 +71,15 @@ docker compose up -d --build jupyter
 ```
 
 Cuando termine, JupyterLab está en http://localhost:8888 (token: `workshop`).
+Los notebooks se abren en orden y cada uno se ejecuta completo con el menú
+**Run > Restart Kernel and Run All Cells**:
+
+| Notebook | Qué muestra |
+|---|---|
+| `00_system_check` | La GPU, el driver y PyTorch desde un contenedor; CPU contra GPU |
+| `01_llm` | El modelo de texto desde Python; tokens por segundo con peticiones en paralelo |
+| `02_vlm` | El modelo de visión: describir una imagen y sacar sus datos en JSON |
+| `03_agents` | Un agente con herramientas, construido paso a paso |
 
 ## Paso 4. Etapa 3: el modelo grande (en segundo plano)
 
@@ -70,7 +89,12 @@ En la segunda terminal, cuando acabe la etapa 2:
 ./scripts/download-model.sh qwen3:30b-instruct
 ```
 
-Para usarlo, cambiar una línea en `.env`:
+En cuanto termina la descarga, el modelo aparece en el selector "Modelo de
+texto" de la interfaz (arriba a la derecha). Al elegirlo ahí, el chat y los
+agentes lo usan de inmediato, sin reiniciar nada: así se repite la misma
+pregunta con los dos modelos y se comparan.
+
+Para dejarlo como modelo predeterminado, cambiar una línea en `.env`:
 
 ```bash
 LLM_MODEL=qwen3:30b-instruct
