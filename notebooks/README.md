@@ -12,7 +12,7 @@ Open JupyterLab at http://localhost:8888 and run them in order with
 | `00_system_check.ipynb` | GPU, driver, CUDA and PyTorch from inside a container; CPU vs GPU benchmark | the GPU |
 | `01_llm.ipynb` | chat and streaming through the OpenAI-compatible API; throughput under 1, 4, 8 and 16 parallel requests | the text model |
 | `02_vlm.ipynb` | image description; structured JSON extraction from an inspection card, checked field by field | the vision model |
-| `03_agents.ipynb` | tool calling step by step, then the full loop and a hand-off: what the web UI visualizes | the text model and the backend (it creates the sample database) |
+| `03_agents.ipynb` | tool calling step by step, then the full loop and a hand-off: what the web UI visualizes | the text model and the backend (it creates the sample office database) |
 
 Notebook prose is in Spanish. The notebooks are committed without outputs.
 `02_vlm` draws its own test image, so no sample files are needed; to try a

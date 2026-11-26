@@ -69,7 +69,7 @@ async def list_containers() -> dict:
     }
 
 
-async def query_production(sql: str) -> dict:
+async def query_office(sql: str) -> dict:
     if not sql.lstrip().lower().startswith("select"):
         raise ValueError("Solo se permiten consultas SELECT.")
     # mode=ro: the database cannot be modified even if the statement tries to.

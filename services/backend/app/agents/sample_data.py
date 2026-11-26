@@ -1,9 +1,10 @@
-"""Synthetic shift data for the "Inspector de turno" scenario.
+"""Synthetic office data for the "Inspector de oficina" scenario.
 
 Rebuilt at every backend start so that "ayer" in a question always has data.
 The numbers are invented; one problem is planted on purpose so the analyst has
-something to find: line L2, night shift, scrap and downtime rising over the
-last four days.
+something to find: floor "piso 2", at night, the air conditioning failing more
+each day over the last four days (temperature, fault reports and minutes
+without service all rising).
 """
 
 import random
@@ -11,24 +12,29 @@ import sqlite3
 from datetime import date, timedelta
 from pathlib import Path
 
-DB_PATH = Path("/data/produccion.sqlite")
+DB_PATH = Path("/data/oficina.sqlite")
 
 DAYS = 14
-SHIFTS = ["matutino", "vespertino", "nocturno"]
-LINES = ["L1", "L2", "L3"]
-DEFECTS = ["rebaba", "porosidad", "dimensional", "rayado superficial"]
-STOP_CAUSES = ["cambio de modelo", "falta de material", "ajuste de herramental", "atasco en banda"]
+SLOTS = ["temprano", "tarde", "noche"]
+FLOORS = ["piso 1", "piso 2", "piso 3"]
+# (most reported fault, its cause): everyday faults of a normal office.
+FAULTS = [
+    ("impresora", "atasco de papel"),
+    ("red wifi", "punto de acceso saturado"),
+    ("iluminación", "lámpara fundida"),
+]
+PLANTED_FAULT = ("aire acondicionado", "compresor apagado")
 
 SCHEMA = """
-CREATE TABLE produccion (
-    fecha TEXT,              -- AAAA-MM-DD
-    turno TEXT,              -- matutino | vespertino | nocturno
-    linea TEXT,              -- L1 | L2 | L3
-    piezas_producidas INTEGER,
-    piezas_scrap INTEGER,
-    paro_min INTEGER,        -- minutos de paro no planeado
-    defecto_principal TEXT,
-    causa_paro TEXT
+CREATE TABLE oficina (
+    fecha TEXT,                    -- AAAA-MM-DD
+    horario TEXT,                  -- temprano | tarde | noche
+    piso TEXT,                     -- piso 1 | piso 2 | piso 3
+    temperatura_c REAL,            -- temperatura promedio del piso
+    reportes INTEGER,              -- reportes de falla levantados
+    minutos_sin_servicio INTEGER,  -- minutos con algún servicio caído (aire, red, luz)
+    falla_principal TEXT,
+    causa TEXT
 )
 """
 
@@ -39,28 +45,24 @@ def build() -> None:
     rows = []
     for days_ago in range(DAYS, 0, -1):
         day = today - timedelta(days=days_ago)
-        for shift in SHIFTS:
-            for line in LINES:
-                produced = rng.randint(1150, 1300)
-                scrap_rate = rng.uniform(0.012, 0.025)
-                downtime = rng.randint(5, 25)
-                defect = rng.choice(DEFECTS[:3])
-                cause = rng.choice(STOP_CAUSES[:3])
-                if line == "L2" and shift == "nocturno" and days_ago <= 4:
+        for slot in SLOTS:
+            for floor in FLOORS:
+                temperature = round(rng.uniform(21.0, 23.5), 1)
+                reports = rng.randint(1, 3)
+                minutes_down = rng.randint(5, 25)
+                fault, cause = rng.choice(FAULTS)
+                if floor == "piso 2" and slot == "noche" and days_ago <= 4:
                     severity = 5 - days_ago  # 1 (four days ago) .. 4 (yesterday)
-                    scrap_rate = 0.03 + 0.018 * severity
-                    downtime = 30 + 15 * severity
-                    produced -= 60 * severity
-                    defect = "rayado superficial"
-                    cause = "atasco en banda"
-                rows.append(
-                    (day.isoformat(), shift, line, produced, round(produced * scrap_rate), downtime, defect, cause)
-                )
+                    temperature = 25.0 + 1.5 * severity
+                    reports = 2 + 2 * severity
+                    minutes_down = 30 + 15 * severity
+                    fault, cause = PLANTED_FAULT
+                rows.append((day.isoformat(), slot, floor, temperature, reports, minutes_down, fault, cause))
 
     DB_PATH.parent.mkdir(parents=True, exist_ok=True)
     DB_PATH.unlink(missing_ok=True)
     connection = sqlite3.connect(DB_PATH)
     with connection:
         connection.execute(SCHEMA)
-        connection.executemany("INSERT INTO produccion VALUES (?, ?, ?, ?, ?, ?, ?, ?)", rows)
+        connection.executemany("INSERT INTO oficina VALUES (?, ?, ?, ?, ?, ?, ?, ?)", rows)
     connection.close()

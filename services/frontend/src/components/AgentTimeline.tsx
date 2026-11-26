@@ -211,7 +211,7 @@ function Result({ value }: { value: unknown }) {
   );
 }
 
-// Query results keep their decimals: a scrap rate of 0.0749 must not read as 0.1.
+// Query results keep their decimals: an average of 0.0749 must not read as 0.1.
 const cellNumber = new Intl.NumberFormat("es-MX", { maximumFractionDigits: 4 });
 
 function asTable(value: unknown): { columns: string[]; rows: unknown[][]; truncated: boolean } | null {

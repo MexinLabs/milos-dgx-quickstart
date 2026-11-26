@@ -59,8 +59,9 @@ a la derecha, el panel de GPU, que se ve desde cualquiera de ellas:
 | Visión | Se carga una imagen (arrastrar, elegir o pegar) y se le pregunta al modelo de visión |
 | Agentes | Se elige un escenario y se ve qué agente trabaja, qué herramienta llama y qué le responde |
 
-El escenario "Inspector de turno" pide una foto: sirve cualquiera de una línea
-de producción, un almacén o un área de trabajo.
+El escenario "Inspector de oficina" pide una foto. Tomen una con el celular
+del lugar donde están: un escritorio, una sala de juntas, el rincón donde quedó
+la Spark con sus cables.
 
 ## Paso 3. Etapa 2: Jupyter (en otra terminal, en segundo plano)
 

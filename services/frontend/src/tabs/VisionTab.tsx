@@ -93,7 +93,7 @@ export function VisionTab({ model, active }: { model: string; active: boolean })
         <Card className="flex min-h-40 flex-1 flex-col gap-3 overflow-y-auto p-5">
           {!stream && (
             <p className="m-auto max-w-md text-center text-muted">
-              {image ? "Elige una pregunta y presiona Analizar." : "Primero carga una imagen: una foto de planta, un tablero, una etiqueta."}
+              {image ? "Elige una pregunta y presiona Analizar." : "Primero carga una imagen: una foto de tu oficina, un tablero, una etiqueta."}
             </p>
           )}
           {stream?.status === "waiting" && <Waiting what="Esperando al modelo de visión" />}

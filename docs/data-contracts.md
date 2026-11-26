@@ -96,15 +96,15 @@ The graph layout is declared by the scenario, not computed in the browser:
 
 ```json
 {
-  "id": "shift_inspector",
-  "title": "Inspector de turno",
+  "id": "office_inspector",
+  "title": "Inspector de oficina",
   "description": "Un supervisor reparte el trabajo…",
   "needs_image": true,
-  "examples": ["¿Hay algo que deba atender antes del siguiente turno?"],
+  "examples": ["¿Hay algo en la oficina que deba atender antes de mañana?"],
   "nodes": [
     {"id": "supervisor", "kind": "agent", "label": "Supervisor", "x": 0, "y": 1},
-    {"id": "query_production", "kind": "tool", "label": "SQL producción", "x": 2, "y": 2}
+    {"id": "query_office", "kind": "tool", "label": "SQL oficina", "x": 2, "y": 2}
   ],
-  "edges": [["supervisor", "vision_inspector"], ["data_analyst", "query_production"]]
+  "edges": [["supervisor", "vision_inspector"], ["data_analyst", "query_office"]]
 }
 ```

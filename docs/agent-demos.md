@@ -46,24 +46,29 @@ One agent with read-only tools about the machine it runs on.
   That gives the backend visibility of the host's containers; acceptable on a
   workshop machine, not something to leave in a product.
 
-### B. Inspector de turno (main demo)
+### B. Inspector de oficina (main demo)
 
 Supervisor with three specialists. One run uses the LLM, the VLM and tools.
 
 ```
-supervisor ──► vision_inspector ──► (VLM) describes the line photo, lists findings
-           ──► data_analyst     ──► query_production (SQL over synthetic shift data)
-           ──► report_writer    ──► shift report in Spanish
+supervisor ──► vision_inspector ──► (VLM) describes the office photo, lists findings
+           ──► data_analyst     ──► query_office (SQL over synthetic office data)
+           ──► report_writer    ──► inspection report in Spanish
 ```
 
-- Input: a photo of a production line or a safety scene, plus a question such
-  as "¿Hay algo que deba atender antes del siguiente turno?"
-- Data: a synthetic SQLite database (production, scrap and downtime per shift,
-  line and day), rebuilt under `data/` at every backend start. One problem is
-  planted for the analyst to find: line L2, night shift, scrap and downtime
-  rising over the last four days.
-- The photo is uploaded by whoever runs the demo; the repo ships none yet.
-- Why: it is the Physical AI story in one screen: see, check the data, decide.
+- Input: a photo of an office (a desk, a meeting room, the corner where the
+  machine sits), plus a question such as "¿Hay algo en la oficina que deba
+  atender antes de mañana?"
+- Data: a synthetic SQLite database (average temperature, fault reports and
+  minutes without service per day, time of day and floor), rebuilt under
+  `data/` at every backend start. One problem is planted for the analyst to
+  find: floor "piso 2", at night, the air conditioning failing more each day
+  over the last four days.
+- The photo is taken by whoever runs the demo, with a phone. An office is what
+  every participant has at hand during a remote session, which is why the
+  scenario is about one.
+- Why: see, check the data, decide, in one screen. The same pattern applies to
+  a production line with a camera and its production data.
 
 ### C. Panel de expertos en paralelo (if time allows)
 
