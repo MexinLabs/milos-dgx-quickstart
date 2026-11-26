@@ -52,10 +52,17 @@ if have docker; then
   pass "$(docker --version)"
   if docker info >/dev/null 2>&1; then
     pass "Docker daemon reachable without sudo"
-    if docker info 2>/dev/null | grep -qi 'runtimes:.*nvidia'; then
+    # Docker reaches the GPU either through a registered "nvidia" runtime or
+    # through CDI devices (DGX OS with a recent Docker). Neither showing up here
+    # is not proof of a problem: --deep runs a container, which is the real test.
+    DOCKER_INFO="$(docker info 2>/dev/null)"
+    if grep -qi 'runtimes:.*nvidia' <<< "$DOCKER_INFO"; then
       pass "NVIDIA runtime registered in Docker"
+    elif grep -qi 'nvidia\.com/gpu' <<< "$DOCKER_INFO"; then
+      pass "NVIDIA GPU exposed to Docker through CDI"
     else
-      fail "NVIDIA runtime not registered (sudo nvidia-ctk runtime configure --runtime=docker && sudo systemctl restart docker)"
+      warn "Docker lists no NVIDIA runtime and no CDI GPU device; --deep tells whether containers get the GPU"
+      info "If --deep fails: sudo nvidia-ctk runtime configure --runtime=docker && sudo systemctl restart docker"
     fi
     ROOT_DIR="$(docker info --format '{{.DockerRootDir}}' 2>/dev/null)"
     FREE_GB="$(df -BG --output=avail "$ROOT_DIR" 2>/dev/null | tail -1 | tr -dc '0-9')"
