@@ -92,6 +92,16 @@ backend restarts, that proxy can leave an open event stream hanging instead of
 closing it, so the GPU panel reconnects on its own after a few seconds of
 silence, and an agent run that will never finish can be dropped from the UI.
 
+## 2026-11-26: context length is set explicitly
+
+`OLLAMA_CONTEXT_LENGTH` is in both env files (4096 on the laptop, 8192 on the
+DGX Spark). Without it Ollama sizes the context from the machine's memory. On
+the Spark it chose the model's maximum, 262,144 tokens per request, times
+`OLLAMA_NUM_PARALLEL=4`: over a million tokens of context, and the model
+process was killed while loading. Measured on the laptop: a 4000 x 3000 photo
+costs about 4,000 prompt tokens with `qwen3-vl:4b-instruct`, so 8192 leaves
+room for the photo and the answer.
+
 ## Open questions
 
 | Question | Why it matters |
