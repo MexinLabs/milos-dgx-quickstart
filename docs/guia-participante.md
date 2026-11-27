@@ -11,7 +11,6 @@ etapas, mientras se explica otra cosa:
 |---|---|---|---|
 | 1 | Servidor de modelos y los dos modelos pequeños | 8.3 GB | 11 min |
 | 2 | Contenedor de Jupyter con PyTorch | 12.9 GB | 17 min |
-| 3 | Modelo grande para los agentes | 18.6 GB | 25 min |
 
 ## Paso 0. Primer arranque
 
@@ -83,33 +82,6 @@ Los notebooks se abren en orden y cada uno se ejecuta completo con el menú
 | `02_vlm` | El modelo de visión: describir una imagen y sacar sus datos en JSON |
 | `03_agents` | Un agente con herramientas, construido paso a paso |
 
-## Paso 4. Etapa 3: el modelo grande (en segundo plano)
-
-En la segunda terminal, cuando acabe la etapa 2:
-
-```bash
-./scripts/download-model.sh qwen3:30b-instruct
-```
-
-En cuanto termina la descarga, el modelo aparece en el selector "Modelo de
-texto" de la interfaz (arriba a la derecha). Al elegirlo ahí, el chat y los
-agentes lo usan de inmediato, sin reiniciar nada: así se repite la misma
-pregunta con los dos modelos y se comparan.
-
-Para dejarlo como modelo predeterminado, cambiar una línea en `.env`:
-
-```bash
-LLM_MODEL=qwen3:30b-instruct
-```
-
-y reiniciar los servicios que lo usan:
-
-```bash
-docker compose up -d backend jupyter
-```
-
-Es el mismo código con otro modelo: lo único que cambió fue la configuración.
-
 ## Direcciones
 
 | Qué | Dirección |
@@ -132,9 +104,21 @@ Otros modelos que vale la pena probar, con el mismo comando de descarga:
 
 | Modelo | Tamaño | Para qué |
 |---|---|---|
+| `qwen3:30b-instruct` | 18.6 GB | Un modelo de texto más grande para el chat y los agentes |
 | `qwen3-vl:8b-instruct` | 6.2 GB | Mejor visión; se activa con `VLM_MODEL` en `.env` |
 | `qwen3-vl:32b-instruct` | 20.9 GB | La mejor visión |
 | `qwen3-next:80b` | 50.4 GB | Un modelo de 80B que no cabe en una estación de trabajo normal |
+
+Por ejemplo:
+
+```bash
+./scripts/download-model.sh qwen3:30b-instruct
+```
+
+Un modelo de texto recién descargado aparece en el selector "Modelo de texto"
+de la interfaz (arriba a la derecha); al elegirlo, el chat y los agentes lo
+usan sin reiniciar nada. Para dejarlo como predeterminado, cambiar `LLM_MODEL`
+en `.env` y correr `docker compose up -d backend jupyter`.
 
 Para apagar todo:
 

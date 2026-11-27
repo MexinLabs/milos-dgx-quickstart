@@ -2,7 +2,7 @@
 
 Formato: sesión remota que empieza con el unboxing de la DGX Spark. El
 presentador comparte la pantalla de su Spark y cada participante repite los
-pasos en la suya; todo se abre en `localhost`. Duración estimada: 3 horas.
+pasos en la suya; todo se abre en `localhost`. Duración estimada: 2 horas 50 minutos.
 
 Los pasos y comandos están en [guia-participante.md](guia-participante.md).
 Las descargas corren en segundo plano mientras avanza la sesión.
@@ -15,8 +15,8 @@ Las descargas corren en segundo plano mientras avanza la sesión.
 | 4 | LLM local | 25 | Chat en vivo, tokens por segundo, peticiones en paralelo | Etapa 2: Jupyter (12.9 GB) |
 | 5 | VLM | 20 | El modelo describe una foto y extrae datos estructurados | |
 | 6 | Descanso | 10 | | |
-| 7 | Contenedores con GPU y Jupyter | 25 | PyTorch usando la GPU; CPU contra GPU; los modelos desde un notebook | Etapa 3: modelo grande (18.6 GB) |
-| 8 | Agentes | 40 | Agentes y herramientas paso a paso con la carga de GPU al lado; primero con el modelo pequeño, luego con el grande | |
+| 7 | Contenedores con GPU y Jupyter | 25 | PyTorch usando la GPU; CPU contra GPU; los modelos desde un notebook | |
+| 8 | Agentes | 30 | Agentes y herramientas paso a paso con la carga de GPU al lado: un agente que revisa la máquina y un equipo que inspecciona una oficina | |
 | 9 | Cierre y siguientes pasos | 10 | Qué se puede construir sobre esto; milOS | |
 
 ## Bloque 3: qué revisamos
@@ -28,12 +28,15 @@ Las descargas corren en segundo plano mientras avanza la sesión.
 5. `docker run --rm --gpus all ubuntu:24.04 nvidia-smi`: la GPU dentro de un contenedor.
 6. NGC: de dónde salen los contenedores oficiales (`nvcr.io`).
 
-## Bloque 8: mismo código, otro modelo
+## Bloque 8: los dos escenarios
 
-Los agentes se corren primero con `qwen3:4b-instruct`. Cuando termina la
-etapa 3 se elige `qwen3:30b-instruct` en el selector de modelo de la interfaz
-y se repite la misma pregunta, para comparar qué tan bien usa las herramientas
-cada modelo. Las corridas anteriores quedan a un clic para verlas otra vez.
+1. DGX Ops Copilot: un agente con herramientas de solo lectura sobre la propia
+   máquina (GPU, modelos, disco, contenedores).
+2. Inspector de oficina: un supervisor y tres especialistas. Se carga una foto
+   de la oficina, o la foto de una hoja con datos, y el equipo entrega un reporte.
+
+Toda la sesión corre con los modelos pequeños. Los modelos más grandes quedan
+para después (lista al final de la guía).
 
 ## Si algo falla durante la sesión
 
@@ -42,4 +45,4 @@ cada modelo. Las corridas anteriores quedan a un clic para verlas otra vez.
 | Un servicio no levanta | `docker compose logs <servicio>` y compartir la salida |
 | El modelo tarda en responder la primera vez | Se está cargando en memoria; esperar y repetir |
 | La interfaz no abre | `docker compose ps`; si la Spark no tiene monitor, revisar el túnel SSH de la guía |
-| Una descarga va lenta | Seguir con el modelo pequeño; el grande se puede terminar después |
+| Una descarga va lenta | Seguir con lo que ya esté listo y ver el resto en la pantalla compartida; la descarga puede terminar después |

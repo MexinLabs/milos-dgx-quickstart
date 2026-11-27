@@ -92,6 +92,14 @@ backend restarts, that proxy can leave an open event stream hanging instead of
 closing it, so the GPU panel reconnects on its own after a few seconds of
 silence, and an agent run that will never finish can be dropped from the UI.
 
+## 2026-11-26: the session runs on the small models only
+
+The third download stage (`qwen3:30b-instruct`, 18.6 GB) and the comparison
+between the small and the large model were taken out of the session: there is
+not enough time for a 25-minute download and a second round of agent runs. The
+30B stays in the guide as something to try afterwards; the model picker in the
+UI makes it usable the moment it is downloaded.
+
 ## 2026-11-26: context length is set explicitly
 
 `OLLAMA_CONTEXT_LENGTH` is in both env files (4096 on the laptop, 8192 on the
