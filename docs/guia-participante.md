@@ -61,7 +61,8 @@ a la derecha, el panel de GPU, que se ve desde cualquiera de ellas:
 
 El escenario "Inspector de oficina" pide una foto. Tomen una con el celular
 del lugar donde están: un escritorio, una sala de juntas, el rincón donde quedó
-la Spark con sus cables.
+la Spark con sus cables. También sirve la foto de una hoja con datos (una
+bitácora, un registro): el agente la lee y la compara con la base de datos.
 
 ## Paso 3. Etapa 2: Jupyter (en otra terminal, en segundo plano)
 

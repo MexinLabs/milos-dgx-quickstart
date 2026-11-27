@@ -8,6 +8,7 @@ import { Button, Card, Chip, ErrorBox, Icon, StreamStats, Waiting } from "../com
 const EXAMPLES = [
   "Describe lo que ves en esta imagen.",
   "Lista los riesgos de seguridad que observes, del más grave al menos grave.",
+  "Copia en una tabla los datos de esta hoja y dime qué fila es la más grave y por qué.",
   'Devuelve solo un JSON con esta forma: {"lugar": "", "personas": 0, "equipo": [], "riesgos": []}',
 ];
 

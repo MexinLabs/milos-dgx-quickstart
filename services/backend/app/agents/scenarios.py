@@ -125,6 +125,9 @@ def _office_inspector() -> dict[str, Agent]:
                 "Eres inspector visual de oficinas. Describe solo lo que se ve en la foto: mobiliario, equipo, "
                 "personas y condiciones. Después lista hasta cinco hallazgos que merezcan atención "
                 "(seguridad, orden, cableado, ergonomía, estado del equipo), uno por línea. "
+                "Si la foto es un documento, una bitácora o una hoja con datos, en lugar de eso copia sus "
+                "datos tal como aparecen: título, piso, horario, cada fila con su fecha y sus cifras, y las "
+                "observaciones. "
                 "Si algo no se distingue, dilo. Responde en español."
             ),
             vision=True,
@@ -193,7 +196,8 @@ OFFICE_INSPECTOR = Scenario(
     needs_image=True,
     examples=[
         "¿Hay algo en la oficina que deba atender antes de mañana?",
-        "Revisa la foto y dime si coincide con lo que dicen los datos de la oficina de los últimos días.",
+        "Esta es la bitácora en papel del rondín de noche. Compárala con los datos de la oficina: "
+        "dime si coinciden y qué debo atender mañana.",
     ],
     nodes=[
         {"id": "supervisor", "kind": "agent", "label": "Supervisor", "x": 0, "y": 1},

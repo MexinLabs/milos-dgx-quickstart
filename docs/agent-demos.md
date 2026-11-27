@@ -64,6 +64,10 @@ supervisor ──► vision_inspector ──► (VLM) describes the office photo
   `data/` at every backend start. One problem is planted for the analyst to
   find: floor "piso 2", at night, the air conditioning failing more each day
   over the last four days.
+- The image can also be a document: a photo or scan of a paper log with
+  readings per day. The vision inspector then copies its rows instead of
+  describing a room, the analyst queries the same nights, and the report says
+  whether paper and database agree (second example question).
 - The photo is taken by whoever runs the demo, with a phone. An office is what
   every participant has at hand during a remote session, which is why the
   scenario is about one.
